@@ -8,13 +8,25 @@ router = APIRouter(prefix="/employees", tags=["Employees"])
 
 @router.post("/")
 def add_employee(emp: EmployeeCreate, db: Session = Depends(get_db)):
-    exists = db.query(Employee).filter(Employee.employee_id == emp.employee_id).first()
+    exists = db.query(Employee).filter(
+        Employee.employee_id == emp.employee_id
+    ).first()
+
     if exists:
         raise HTTPException(status_code=400, detail="Employee already exists")
 
-    db.add(Employee(**emp.dict()))
+    employee = Employee(
+        employee_id=emp.employee_id,
+        name=emp.full_name,
+        email=emp.email,
+        department=emp.department
+    )
+
+    db.add(employee)
     db.commit()
-    return emp
+    db.refresh(employee)
+
+    return employee
 
 @router.get("/")
 def list_employees(db: Session = Depends(get_db)):
