@@ -4,7 +4,13 @@ from database import Base
 class Attendance(Base):
     __tablename__ = "attendance"
 
-    id = Column(Integer, primary_key=True, index=True)
-    employee_id = Column(String, ForeignKey("employees.employee_id"))
-    date = Column(Date)
-    status = Column(String)
+    id = Column(Integer, primary_key=True)
+    employee_id = Column(
+        String,
+        ForeignKey("employees.employee_id", ondelete="CASCADE"),
+        nullable=False
+    )
+    date = Column(Date, nullable=False)
+    status = Column(String, nullable=False)
+
+    employee = relationship("Employee", back_populates="attendance")
